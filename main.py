@@ -1,3 +1,6 @@
+import sqlite3
+
+
 def login():
     print('Welcome to the login screen\n')
     user_name = input('Enter user name: ')
@@ -6,7 +9,7 @@ def login():
     # Code here to send to microservice to get checked
 
 
-def register(user_data_dictionary):
+def register(user_data_dictionary, cursor):
     print('Welcome to the registration screen\n')
     user_name = input('Create a user name: ')
     password = input('Create a password: ')
@@ -15,10 +18,10 @@ def register(user_data_dictionary):
 
     # code here to add to user_name_password dictionary
 
-    create_profile(user_name, user_data_dictionary)
+    create_profile(user_name, user_data_dictionary, cursor)
 
 
-def create_profile(user_name, user_data_dictionary):
+def create_profile(user_name, user_data_dictionary, cursor):
     print('Create a Personal Profile!\n\n')
 
     first_name = input('Enter your first name: ')
@@ -26,6 +29,12 @@ def create_profile(user_name, user_data_dictionary):
     phone = input('Enter your phone number: ')
     e_mail = input('Enter your e-mail address: ')
     discovery = input('Please tell us how you found us: ')
+
+    # creates a table called user_data if it does not exist
+    cursor.execute("CREATE TABLE IF NOT EXISTS user_data (user_name TEXT, first_name TEXT, last_name TEXT, "
+                   "phone INTEGER, e_mail TEXT, discovery TEXT)")
+
+    cursor.execute("INSERT INTO user_data (user_name, first_name, last_name, phone, e_mail, discovery) VALUES(?, ?, ?, ?, ?, ?)", (user_name, first_name, last_name, phone, e_mail, discovery))
 
     user_data_list = [first_name, last_name, phone, e_mail, discovery]
 
@@ -42,12 +51,19 @@ def main():
 
     login_input = input('Enter ‘L’ to login to your profile or ‘R’ to register: ')
 
+    connection = sqlite3.connect('users.db')
+    cursor = connection.cursor()
+
     user_data_dictionary = {}
 
     if login_input.lower() == 'l':
         login()
     elif login_input.lower() == 'r':
-        register(user_data_dictionary)
+        register(user_data_dictionary, cursor)
+
+    connection.commit()
+
+    print(connection.total_changes)
 
 
 if __name__ != '__main__':
