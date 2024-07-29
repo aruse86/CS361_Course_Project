@@ -93,7 +93,7 @@ def edit_profile(user_name, cursor):
 
     if go_home == '1':
         edit_profile(user_name, cursor)
-    elif go_home == '2'
+    elif go_home == '2':
         personal_home_page(user_name, cursor)
     else:
         return 0
