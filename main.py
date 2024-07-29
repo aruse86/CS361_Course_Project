@@ -52,8 +52,9 @@ def create_profile(user_name, password, cursor):
                    "last_name TEXT, phone INTEGER, e_mail TEXT, discovery TEXT, journal TEXT)")
 
     cursor.execute("INSERT INTO user_data (user_name, password, first_name, last_name, phone, e_mail, discovery,"
-                   "journal) VALUES(?, ?, ?, ?, ?, ?)", (user_name, password, first_name, last_name, phone, e_mail,
-                                                         discovery, journal))
+                   "journal) VALUES(?, ?, ?, ?, ?, ?, ?, ?)", (user_name, password, first_name, last_name, phone,
+                                                               e_mail, discovery, journal))
+    connection.commit()
 
     go_home = input('\nThank you for registering with us. Your profile is now complete!\n\nEnter 0 to go to your '
                     'home page or any other key to exit: ')
@@ -118,7 +119,7 @@ def main():
     print('This is a place where you can log and keep track of your favorite wines for that special occasion\n'
           'or when you feel like cozying up on the couch watching a movie with a glass of wine in hand!\n')
 
-    login_input = input('Enter ‘1’ to login to your account, 2 to register a new account, or any other key to exit'
+    login_input = input('Enter ‘1’ to login to your account, 2 to register a new account, or any other key to exit '
                         'the program: ')
 
     connection = sqlite3.connect('users.db')
