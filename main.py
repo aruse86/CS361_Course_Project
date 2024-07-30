@@ -150,6 +150,7 @@ def wine_journal_home(user_name):
     else:
         personal_home_page(user_name)
 
+
     journal_connect.commit()
     wine_journal_home(user_name)
 
