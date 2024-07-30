@@ -32,10 +32,10 @@ print(output)
 
 # prints all
 query = 'SELECT * FROM user_data where user_name = ?'
-cursor.execute(query, ('ssioepo',))
+cursor.execute(query, ('aruse',))
 print("\nSpecific data")
 output = cursor.fetchall()
-print(output)
+print(output[0])
 
 
 
