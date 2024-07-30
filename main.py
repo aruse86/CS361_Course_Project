@@ -8,7 +8,7 @@ def login(cursor, connection):
 
     # Code here to send to microservice to get checked
 
-    personal_home_page(user_name, cursor, connection)
+    personal_home_page(user_name)
 
 
 def register(cursor, connection):
@@ -58,7 +58,7 @@ def create_profile(user_name, password, cursor, connection):
                     'home page or any other key to exit: ')
 
     if go_home == '0':
-        personal_home_page(user_name, cursor, connection)
+        personal_home_page(user_name)
     else:
         return 0
 
@@ -89,17 +89,17 @@ def edit_profile(user_name, cursor, connection):
         query = f'UPDATE user_data SET e_mail = ? WHERE user_name = ?'
         cursor.execute(query, (e_mail, user_name))
     else:
-        personal_home_page(user_name, cursor, connection)
+        personal_home_page(user_name)
 
     connection.commit()
 
-    go_home = input('\nour profile edits are now complete!\nEnter 1 to edit again, 2 to go to your '
+    go_home = input('\nYour profile edits are now complete!\nEnter 1 to edit again, 2 to go to your '
                     'home page or any other key to exit: ')
 
     if go_home == '1':
         edit_profile(user_name, cursor, connection)
     elif go_home == '2':
-        personal_home_page(user_name, cursor, connection)
+        personal_home_page(user_name)
     else:
         return 0
 
@@ -138,12 +138,64 @@ def wine_journal_home(user_name):
         journal_cursor.execute("INSERT INTO wine_data (brand, type, region, year, varietal, comments) "
                                "VALUES(?, ?, ?, ?, ?, ?)", (wine_brand, wine_type, wine_region, wine_year,
                                                             wine_varietal, wine_comments))
-        journal_connect.commit()
+    elif entry == '3':
+        entry = input('Which brand would you like to edit? ')
+        edit_wine_journal(user_name, entry, journal_cursor, journal_connect)
+    elif entry == '4':
+        warning = input('Warning, this will permanently delete the entry. Enter 1 to continue or any other key to '
+                        'exit.')
+        if warning == '1':
+            entry = input('Which brand would you like to delete? ')
+            journal_cursor.execute("DELETE FROM wine_data WHERE brand = ?", (entry,))
+    else:
+        personal_home_page(user_name)
 
+    journal_connect.commit()
     wine_journal_home(user_name)
 
 
-def personal_home_page(user_name, cursor, connection):
+def edit_wine_journal(user_name, entry, journal_cursor, journal_connect):
+    edit = input(f'\nEdit {entry}\nEnter 1 to edit the wine type, 2 to edit the wine region, '
+                 '3 to edit the wine year, 4 to edit the wine varietal, 5 to edit your comments, '
+                 'or any other key to return to your wine journal page: ')
+
+    if edit == '1':
+        wine_type = input('Enter the new wine type: ')
+        query = f'UPDATE wine_data SET type = ? WHERE brand = ?'
+        journal_cursor.execute(query, (wine_type, entry))
+    elif edit == '2':
+        wine_region = input('Enter the new wine region: ')
+        query = f'UPDATE wine_data SET region = ? WHERE brand = ?'
+        journal_cursor.execute(query, (wine_region, entry))
+    elif edit == '3':
+        wine_year = input('Enter the new wine year: ')
+        query = f'UPDATE wine_data SET year = ? WHERE brand = ?'
+        journal_cursor.execute(query, (wine_year, entry))
+    elif edit == '4':
+        wine_varietal = input('Enter the new wine varietal: ')
+        query = f'UPDATE wine_data SET varietal = ? WHERE brand = ?'
+        journal_cursor.execute(query, (wine_varietal, entry))
+    elif edit == '5':
+        wine_comments = input('Enter your new comments: ')
+        query = f'UPDATE wine_data SET comments = ? WHERE brand = ?'
+        journal_cursor.execute(query, (wine_comments, entry))
+    else:
+        wine_journal_home(user_name)
+
+    journal_connect.commit()
+
+    go_home = input('\nYour journal entry edits are now complete!\nEnter 1 to edit again, 2 to go to your '
+                    'wine journal page or any other key to exit: ')
+
+    if go_home == '1':
+        edit_wine_journal(user_name, entry, journal_cursor, journal_connect)
+    elif go_home == '2':
+        wine_journal_home(user_name)
+    else:
+        return 0
+
+
+def personal_home_page(user_name):
     print(f'\nWelcome {user_name}! This is your profile, where you can view your wine journal, and edit your personal '
           f'profile information!')
 
@@ -152,9 +204,11 @@ def personal_home_page(user_name, cursor, connection):
     if action == '1':
         wine_journal_home(user_name)
     elif action == '2':
+        connection = sqlite3.connect('users.db')
+        cursor = connection.cursor()
         edit_profile(user_name, cursor, connection)
     else:
-        return 0
+        quit()
 
 
 def main():
